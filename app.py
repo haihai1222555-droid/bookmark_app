@@ -187,10 +187,7 @@ def update_bookmark(bookmark_id):
 
     if not title or not url:
         return jsonify({"ok": False, "message": "제목과 URL을 모두 입력해주세요."}), 400
-
-    if not url.startswith("http://") and not url.startswith("https://"):
-        return jsonify({"ok": False, "message": "URL은 http:// 또는 https://로 시작해야 합니다."}), 400
-
+    
     # 북마크 번호뿐 아니라 owner도 함께 확인합니다.
     result = db.bookmarks.update_one(
         {"_id": ObjectId(bookmark_id), "owner": user_id},
