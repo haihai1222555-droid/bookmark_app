@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 북마크 - 회원가입</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="login-box signup-box">
+        <h2 class="mb-4">회원가입</h2>
+
+        <form method="POST" id="signup-form">
+            <div class="mb-2">
+                <label for="user_id" class="form-label">ID</label>
+                <input type="text" class="form-control" id="user_id" name="user_id" required>
+            </div>
+            <button type="button" class="btn btn-outline-secondary btn-sm mb-1" id="check-id-button">중복 확인</button>
+            <p id="id-message" class="small-message"></p>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">PW</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <div class="mb-2">
+                <label for="password_check" class="form-label">PW 확인</label>
+                <input type="password" class="form-control" id="password_check" name="password_check" required>
+            </div>
+            <p id="password-message" class="small-message"></p>
+
+            {% if error %}
+            <p class="error-message">{{ error }}</p>
+            {% endif %}
+
+            <button type="submit" class="btn btn-dark w-100 mt-3">회원가입</button>
+        </form>
+
+        <a href="{{ url_for('login') }}" class="signup-link">로그인으로 돌아가기</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        let idChecked = false;
+
+        $('#user_id').on('input', function () {
+            idChecked = false;
+            $('#id-message').text('중복 확인이 필요합니다.').removeClass('success-message');
+        });
+
+        $('#check-id-button').click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/api/check-id',
+                data: { user_id: $('#user_id').val() },
+                success: function (response) {
+                    idChecked = response.available;
+                    $('#id-message').text(response.message);
+                    $('#id-message').toggleClass('success-message', response.available);
+                },
+                error: function (xhr) {
+                    idChecked = false;
+                    let message = '중복 확인 요청에 실패했습니다.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    $('#id-message').text(message).removeClass('success-message');
+                }
+            });
+        });
+
+        function checkPasswords() {
+            let password = $('#password').val();
+            let passwordCheck = $('#password_check').val();
+
+            if (!password && !passwordCheck) {
+                $('#password-message').text('').removeClass('success-message');
+                return false;
+            }
+
+            if (password === passwordCheck) {
+                $('#password-message').text('비밀번호가 일치합니다.').addClass('success-message');
+                return true;
+            }
+
+            $('#password-message').text('비밀번호가 일치하지 않습니다.').removeClass('success-message');
+            return false;
+        }
+
+        $('#password, #password_check').on('input', checkPasswords);
+
+        $('#signup-form').submit(function (event) {
+            if (!idChecked) {
+                event.preventDefault();
+                alert('아이디 중복 확인을 먼저 해주세요.');
+                return;
+            }
+
+            if (!checkPasswords()) {
+                event.preventDefault();
+                alert('비밀번호와 비밀번호 확인을 같게 입력해주세요.');
+            }
+        });
+    </script>
+</body>
+</html>
