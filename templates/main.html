@@ -1,60 +1,60 @@
 <!doctype html>
-<html lang="ko"> //웹사이트의 기본 언어는 '한국어'라는 것을 명시
+<html lang="ko"> <!--웹사이트의 기본 언어는 '한국어'라는 것을 명시-->
 <head>
-    <meta charset="UTF-8"> //웹사이트의 기본 인코딩을 'UTF-8'로 지정
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> //여러 기기의 화면을 맞춰 주는 로직
+    <meta charset="UTF-8"><!--웹사이트의 기본 인코딩을 'UTF-8'로 지정-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--여러 기기의 화면을 맞춰 주는 로직-->
     <title>나만의 북마크</title> //웹사이트 이름
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> //'bootstrap'이라는 외부 디자인 도구를 불러오는 링크
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> // 'static/style.css'에서 내가 만든 디자인을 불러오는 링크
-</head> //'head' 안에 작성되어 있는 name, href, rel은 body에 작성한 다면 웹사이트의 디자인이 망가질 수 있음.
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><!--'bootstrap'이라는 외부 디자인 도구를 불러오는 링크-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!--'static/style.css'에서 내가 만든 디자인을 불러오는 링크-->
+</head> <!--'head' 안에 작성되어 있는 name, href, rel은 body에 작성한 다면 웹사이트의 디자인이 망가질 수 있음.-->
 <body>
-    <div class="container main-box"> //웹페이지 가운데에 흰색 박스를 배치
-        <header class="page-header"> //상단 패널 (사용자 이름, 로그아웃 등등)
-            <h2>나만의 북마크</h2> //h1=제목, h2=부제목, h3=소제목... h6까지 있음. '나만의 북마크'라는 부제목을 배치
+    <div class="container main-box"> <!--웹페이지 가운데에 흰색 박스를 배치-->
+        <header class="page-header"> <!--상단 패널 (사용자 이름, 로그아웃 등등)-->
+            <h2>나만의 북마크</h2> <!--h1=제목, h2=부제목, h3=소제목... h6까지 있음. '나만의 북마크'라는 부제목을 배치-->
             <div>
-                <span class="me-3">{{ user_id }}님</span> //만들어 둔 상단 패널에 'OOO님'을 띄움
-                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark btn-sm">로그아웃</a> //'OOO님' 옆에 'bootstrap'을 이용한 로그아웃 버튼을 배치
+                <span class="me-3">{{ user_id }}님</span> <!--만들어 둔 상단 패널에 'OOO님'을 띄움-->
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-dark btn-sm">로그아웃</a> <!--'OOO님' 옆에 'bootstrap'을 이용한 로그아웃 버튼을 배치-->
             </div>
         </header>
 
-        <div class="toolbar"> //'검색창'과 '템플릿 추가 버튼'이 있는 패널 배치
-            <div class="input-group search-group"> //'텍스트 입력 창'과 검색 버튼을 그룹으로 묶어서 배치.
-                <input type="text" id="search-keyword" class="form-control" placeholder="제목의 일부를 검색하세요"> //'제목의 일부를 검색하세요'에 검색할 제목 'InputField'를 배치 (유니티의 'placeholder'랑 같은 역할)
-                <button class="btn btn-secondary" id="search-button">검색</button> // 버튼을 눌러서 '검색'을 함 (Enter로도 작동함)
+        <div class="toolbar"> <!--'검색창'과 '템플릿 추가 버튼'이 있는 패널 배치-->
+            <div class="input-group search-group"> <!--'텍스트 입력 창'과 검색 버튼을 그룹으로 묶어서 배치.-->
+                <input type="text" id="search-keyword" class="form-control" placeholder="제목의 일부를 검색하세요"> <!--'제목의 일부를 검색하세요'에 검색할 제목 'InputField'를 배치 (유니티의 'placeholder'랑 같은 역할)-->
+                <button class="btn btn-secondary" id="search-button">검색</button> <!--버튼을 눌러서 '검색'을 함 (Enter로도 작동함)-->
             </div>
-            <button class="btn btn-dark" id="show-add-form">+ 템플릿 추가</button> // '+ 템플릿 추가' 버튼을 배치
+            <button class="btn btn-dark" id="show-add-form">+ 템플릿 추가</button> <!--'+ 템플릿 추가' 버튼을 배치-->
         </div>
 
-        <div id="add-form" class="simple-form d-none"> //'새 북마크' 패널을 숨김
-            <h5>새 북마크</h5> //'새 북마크' 패널을 위한 작은 소제목을 배치
-            <input type="text" id="new-title" class="form-control mb-2" placeholder="제목"> //'새 북마크'에 작성할 제목 'InputField'를 배치
-            <input type="url" id="new-url" class="form-control mb-2" placeholder="https://example.com"> //'URL'에 작성할 제목 'InputField'를 배치
-            <button class="btn btn-dark btn-sm" id="create-button">생성</button> //생성 버튼으로 템플릿을 게시 ('새 북마크' 패널을 숨기며 템플릿이 게시됨)
-            <button class="btn btn-light btn-sm" id="cancel-add-button">취소</button> //취소 버튼으로 템플릿을 게시를 취소 ('새 북마크' 패널을 숨기며 템플릿을 게시하지 않음)
+        <div id="add-form" class="simple-form d-none"> <!--'새 북마크' 패널을 숨김-->
+            <h5>새 북마크</h5> <!--'새 북마크' 패널을 위한 작은 소제목을 배치-->
+            <input type="text" id="new-title" class="form-control mb-2" placeholder="제목"> <!--'새 북마크'에 작성할 제목 'InputField'를 배치-->
+            <input type="url" id="new-url" class="form-control mb-2" placeholder="https://example.com"> <!--'URL'에 작성할 제목 'InputField'를 배치-->
+            <button class="btn btn-dark btn-sm" id="create-button">생성</button> <!--생성 버튼으로 템플릿을 게시 ('새 북마크' 패널을 숨기며 템플릿이 게시됨)-->
+            <button class="btn btn-light btn-sm" id="cancel-add-button">취소</button> <!--취소 버튼으로 템플릿을 게시를 취소 ('새 북마크' 패널을 숨기며 템플릿을 게시하지 않음)-->
         </div>
 
-        <p id="list-message" class="small-message"></p> //코드 테스트를 위해 있는 거 같은데... 지금은 의미 없는 코드 (유니티로 따지면 Debug.Log 같은 거)
+        <p id="list-message" class="small-message"></p> <!--코드 테스트를 위해 있는 거 같은데... 지금은 의미 없는 코드 (유니티로 따지면 Debug.Log 같은 거)-->
 
-        <div id="bookmark-list"> //북마크 목록한테 'bookmark-list'라는 이름을 지정
+        <div id="bookmark-list"> <!--북마크 목록한테 'bookmark-list'라는 이름을 지정-->
             {% for bookmark in bookmarks %}
-            <div class="bookmark-item" data-id="{{ bookmark.id }}"> //북마크 '한 개'를 감싼 패널 (유니티로는 배열이라고 생각하면 좋음)
-                <button class="bookmark-title-button" type="button"> //북마크 한 개의 패널을 펼쳤다 접었다 하는 버튼을 배치
-                    <span class="arrow">▶</span> //▶을 눌러 패널을 펼치 거나 접음
-                    <span class="title-text">{{ bookmark.title }}</span> //북마크의 제목을 불러와 배치
+            <div class="bookmark-item" data-id="{{ bookmark.id }}"> <!--북마크 '한 개'를 감싼 패널 (유니티로는 배열이라고 생각하면 좋음)-->
+                <button class="bookmark-title-button" type="button"> <!--북마크 한 개의 패널을 펼쳤다 접었다 하는 버튼을 배치-->
+                    <span class="arrow">▶</span> <!--▶을 눌러 패널을 펼치 거나 접음-->
+                    <span class="title-text">{{ bookmark.title }}</span> <!--북마크의 제목을 불러와 배치-->
                 </button>
-                <div class="bookmark-detail d-none"> //펼친 북마크 패널의 상세 정보 패널
-                    <p>사이트 주소: <a class="url-link" href="{{ bookmark.url }}" target="_blank" rel="noopener noreferrer">{{ bookmark.url }}</a></p> //북마크의 URL을 불러와 배치 (추가로 URL을 클릭시 현재 탭에서 넘어가는 것이 아닌 새 탭에 띄움)
-                    <button class="btn btn-outline-secondary btn-sm edit-button">수정</button> //북마크의 수정 버튼을 배치
-                    <button class="btn btn-outline-danger btn-sm delete-button">삭제</button> //북마크의 삭제 버튼을 배치
+                <div class="bookmark-detail d-none"> <!--펼친 북마크 패널의 상세 정보 패널-->
+                    <p>사이트 주소: <a class="url-link" href="{{ bookmark.url }}" target="_blank" rel="noopener noreferrer">{{ bookmark.url }}</a></p> <!--북마크의 URL을 불러와 배치 (추가로 URL을 클릭시 현재 탭에서 넘어가는 것이 아닌 새 탭에 띄움)-->
+                    <button class="btn btn-outline-secondary btn-sm edit-button">수정</button> <!--북마크의 수정 버튼을 배치-->
+                    <button class="btn btn-outline-danger btn-sm delete-button">삭제</button> <!--북마크의 삭제 버튼을 배치-->
                 </div>
             </div>
             {% else %}
-            <p class="empty-message">저장한 북마크가 없습니다.</p> //저장한 북마크가 없을 경우 띄우는 텍스트
+            <p class="empty-message">저장한 북마크가 없습니다.</p> <!--저장한 북마크가 없을 경우 띄우는 텍스트-->
             {% endfor %}
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> //틀을 만들었으니 디자인을 맡김
-    <script src="{{ url_for('static', filename='main.js') }}"></script> //틀을 만들었으니 디자인을 맡김
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> <!--틀을 만들었으니 디자인을 맡김-->
+    <script src="{{ url_for('static', filename='main.js') }}"></script> <!--틀을 만들었으니 디자인을 맡김-->
 </body>
 </html>
