@@ -3,6 +3,7 @@ import re
 import random
 import smtplib
 import time
+import resend
 
 from email.mime.text import MIMEText
 from email.header import Header
@@ -318,22 +319,21 @@ def logout():
     return redirect(url_for("login"))
 
 def send_auth_email(target_email, auth_code):
-    mail_user=os.getenv("MAIL_USER")
-    mail_pw = os.getenv("MAIL_PASSWORD")
-
-    content = f"""나만의 북마크에 가입해주셔서 감사합니다.
-    회원가입 인증번호는 [{auth_code}]입니다.
-    인증 화면으로 돌아가 10분 내로 인증해 주시길 바랍니다."""
-
-    msg = MIMEText(content, _charset="utf-8")
-    msg["subject"] = Header("[나만의 북마크] 회원가입 이메일 인증번호", "utf-8")
-    msg["From"] = f"나만의 북마크 <{mail_user}>"
-    msg["To"] = target_email
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 587, timeout=10) as server:
-        server.starttls()
-        server.login(mail_user, mail_pw)
-        server.send_message(msg)
+    resend.api_key = os.getenv("RESEND_API_KEY")
+    params = {
+        "from": "onboarding@resend.dev",
+        "to": [target_email],
+        "subject": "[나만의 북마크] 회원가입 이메일 인증번호",
+        "html": f"""
+        <div style="font-family: sans-serif; padding: 20px; line-height: 1.6;">
+            <h2>나만의 북마크 인증번호</h2>
+            <p>회원가입 인증번호는 아래와 같습니다:</p>
+            <h1 style="color: #0d6efd; letter-spacing: 5px; font-size: 32px;">{auth_code}</h1>
+            <p>화면으로 돌아가 10분 내로 인증번호를 입력해주세요.</p>
+        </div>
+        """
+    }
+    resend.Emails.send(params)
 
 
 
