@@ -330,7 +330,8 @@ def send_auth_email(target_email, auth_code):
     msg["From"] = f"나만의 북마크 <{mail_user}>"
     msg["To"] = target_email
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+    with smtplib.SMTP_SSL("smtp.gmail.com", 587, timeout=10) as server:
+        server.starttls()
         server.login(mail_user, mail_pw)
         server.send_message(msg)
 
