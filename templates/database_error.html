@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>데이터베이스 연결 오류</title>
+    <title>오류</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="login-box">
-        <h3 class="mb-3">MongoDB 연결이 필요합니다</h3>
-        <p>현재 MongoDB 서버에 연결할 수 없습니다.</p>
-        <p class="text-secondary small">MongoDB Community Server를 설치하고 MongoDB 서비스를 실행한 뒤 다시 시도해주세요.</p>
-        <a href="{{ url_for('login') }}" class="btn btn-dark w-100">로그인 화면으로 돌아가기</a>
+        <h2>MongoDB 연결 오류</h2>
+        <hr>
+        <p>데이터베이스에 연결할 수 없습니다.</p>
+        <p>MongoDB 설정을 확인하고 다시 시도해주세요.</p>
+        <a href="{{ url_for('login') }}" class="btn btn-primary">돌아가기</a>
     </div>
 </body>
 </html>
