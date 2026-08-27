@@ -37,6 +37,13 @@ def handle_mongodb_error(error):
 
     return render_template("database_error.html"), 503
 
+def is_valid_id(user_id):
+    pattern = r"^[a-z0-9]{4,12}$"
+    return bool(re.match(pattern, user_id))
+
+def is_valid_password(password):
+    pattern = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=~])[A-Za-z\d!@#$%^&*()_+=~]{8,20}$"
+    return bool(re.match(pattern, password))
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -88,6 +95,10 @@ def signup():
 
         if not user_name or not user_id or not password:
             error = "이름, 아이디, 비밀번호를 모두 입력해주세요."
+        elif not is_valid_id(user_id):
+            error = "아아디는 4~12자의 영문 소문자, 숫자만 가능합니다."
+        elif not is_valid_password(password):
+            error = "비밀번호는 8~20자의 영문, 숫자, 특수문자를 조합해야 합니다."
         elif password != password_check:
             error = "비밀번호가 서로 다릅니다."
         elif db.users.find_one({"user_id": user_id}):
@@ -130,6 +141,9 @@ def check_id():
     if not user_id:
         return jsonify({"available": False, "message": "아이디를 입력해주세요."})
 
+    if not is_valid_id(user_id):
+        return jsonify({"available": False, "message": "아이디는 4~12자의 영문 소문자, 숫자만 가능합니다."})
+
     if db.users.find_one({"user_id": user_id}):
         return jsonify({"available": False, "message": "이미 사용 중인 아이디입니다."})
 
@@ -141,6 +155,9 @@ def api_reset_password():
     user_id = request.form.get("user_id", "").strip()
     email = request.form.get("email", "").strip()
     new_password = request.form.get("new_password", "")
+
+    if not is_valid_password(new_password):
+        return jsonify({"ok": False, "message": "새 비밀번호는 8~20자의 영문, 숫자, 특수문자를 조합해야 합니다."}), 400
 
     if not session.get("is_email_verified") or session.get("auth_email") != email:
         return jsonify({"ok": False, "message": "이메일 인증이 필요합니다."}), 400
@@ -218,9 +235,15 @@ def main():
 
 @app.route("/api/bookmarks", methods=["POST"])
 def create_bookmark():
-    title = request.form.get("title", "").strip()
-    url = request.form.get("url", "").strip()
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"ok": False, "message": ""}),401
 
+    title = request.form.get("title", "").strip()
+    url = request.form.get("url").strip()
+
+    if not title or not url:
+        return jsonify({"ok": False, "message": "제목과 URL을 모두 입력해주세요."}), 400
 
     result = db.bookmarks.insert_one({"owner": user_id, "title": title, "url": url})
 
@@ -234,6 +257,7 @@ def create_bookmark():
 
 @app.route("/api/bookmarks/search")
 def search_bookmarks():
+    user_id = session.get("user_id")
     keyword = request.args.get("keyword", "").strip()
     condition = {"owner": user_id}
 
@@ -255,6 +279,7 @@ def search_bookmarks():
 
 @app.route("/api/bookmarks/<bookmark_id>", methods=["PUT"])
 def update_bookmark(bookmark_id):
+    user_id = session.get("user_id");
     if not ObjectId.is_valid(bookmark_id):
         return jsonify({"ok": False, "message": "잘못된 북마크 번호입니다."}), 400
 
@@ -275,6 +300,7 @@ def update_bookmark(bookmark_id):
 
 @app.route("/api/bookmarks/<bookmark_id>", methods=["DELETE"])
 def delete_bookmark(bookmark_id):
+    user_id = session.get("user_id")
     if not ObjectId.is_valid(bookmark_id):
         return jsonify({"ok": False, "message": "잘못된 북마크 번호입니다."}), 400
 
